@@ -1,4 +1,6 @@
-# WinBack: bring regulars back to their shops
+# Lost & Fund: bring regulars back to their shops
+
+*The lost regular is found, and the shop funds the reunion.*
 
 **The idea.** A payments app (Paytm, PhonePe, Google Pay, BHIM...) sees that customer **B** has
 stopped coming to shop **A**, where B used to be a regular. It works out **why**, and acts only when
@@ -50,7 +52,7 @@ wordmark). Swap in official brand assets only with permission. All four tabs sha
   *range* of likely sales, in Hinglish or English, with a Soundbox voice line. The owner taps
   **Approve budget**, or the shop is on **autopilot**. After the campaign it shows results and the
   weekly settlement statement.
-- **Paytm app:** the customer's home screen with the WinBack offer under *Cashback & Offers*, a push
+- **Paytm app:** the customer's home screen with the Lost & Fund offer under *Cashback & Offers*, a push
   notification, Scan & Pay, the pay screen (full bill plus a cashback preview), and a Paytm-style
   success screen with a **scratch card** for the cashback. Streak offers show visit dots.
   "Why am I seeing this?" and "Stop these offers" are on every offer.
@@ -211,7 +213,7 @@ investigates (`--force` overrides). Low shop approval and input drift are printe
 All settings are in `compliance` in [winback/config.py](winback/config.py). Legal sign-off from the
 platform and its partner PSP banks is still required.
 
-| Rule | How WinBack handles it |
+| Rule | How Lost & Fund handles it |
 |---|---|
 | **NPCI UPI rules** (consent; no third-party sharing; data in India) | Only `offers_consent` customers are trained on, scored or messaged. Shops see bands and ranges, never names, exact counts or scores. Cross-app identity linking is **off** (`cross_app_linking`) |
 | **RBI data localisation** | Run in India (`data_residency: "IN"`). The model uses the payment mode only, never card numbers |
@@ -267,6 +269,8 @@ python run_pipeline.py erase --customers ids.csv
    "win back app share" may be sensitive for them.
 
 ## Layout
+
+The code package is still called `winback` (the product's earlier working name).
 
 ```
 run_pipeline.py          CLI
