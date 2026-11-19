@@ -5,6 +5,8 @@ outputs/
 # Trained models and programme state are rebuilt by the pipeline
 models/
 state/
+# Static demo export (`python run_pipeline.py export-site`), deployed with the Vercel CLI
+site/
 
 # Python
 __pycache__/

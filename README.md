@@ -73,6 +73,21 @@ wordmark). Swap in official brand assets only with permission. All four tabs sha
 `OfferLedger` the pipeline uses. "Export approvals for pipeline" writes a CSV that `decide --decisions`
 accepts.
 
+### Hosted demo
+
+Live at **https://lost-n-fund.vercel.app**. It's a static copy: a snapshot of the latest campaign, with
+the demo API and the cashback ledger running in the browser (same rules as the Python ledger). Each
+viewer's clicks stay in their own browser, and "Reset demo" clears them. The header says it is a concept
+demo not affiliated with Paytm, and search engines are told not to index it.
+
+To publish a new run:
+
+```powershell
+python run_pipeline.py export-site
+cd site
+vercel --prod
+```
+
 ## How it works
 
 **1. Shop-level lapse model** ([features.py](lost_n_fund/features.py), [model.py](lost_n_fund/model.py))
@@ -288,5 +303,7 @@ lost_n_fund/monitoring.py    programme health + kill switches
 lost_n_fund/report.py        HTML report
 lost_n_fund/pipeline.py      stages
 demo/server.py           demo API on the latest run (uses the real ledger)
+demo/export_static.py    static copy of the demo for Vercel (`export-site`)
 demo/static/             Paytm Ops, Paytm for Business, Paytm app screens (plain HTML/JS/CSS)
+demo/static/api-static.js  the demo API + ledger in the browser, used by the static copy
 ```

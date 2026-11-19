@@ -10,6 +10,7 @@ Examples
   python run_pipeline.py decide  --run outputs/campaign_2026-11-19 [--decisions approvals.csv]
   python run_pipeline.py measure --run outputs/campaign_2026-11-19 [--post-txns after.csv --events events.csv]
   python run_pipeline.py demo                                  # clickable demo screens at http://127.0.0.1:8000
+  python run_pipeline.py export-site                           # static copy of the demo in site/ (for Vercel)
   python run_pipeline.py purge [--as-of 2027-03-01]            # delete personal data older than retention_days
   python run_pipeline.py erase --customers ids.csv             # right to erasure (column: customer_id)
 """
@@ -30,7 +31,7 @@ def main() -> None:
         pass
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("stage", choices=["all", "generate", "train", "train-uplift", "campaign", "decide", "measure",
-                                      "demo", "purge", "erase"])
+                                      "demo", "export-site", "purge", "erase"])
     ap.add_argument("--config", help="JSON file overriding lost_n_fund/config.py defaults")
     ap.add_argument("--snapshot", help="scoring date YYYY-MM-DD (default: day after last transaction)")
     ap.add_argument("--run", help="campaign folder for decide/measure/demo (default: latest)")
@@ -77,6 +78,9 @@ def main() -> None:
     elif args.stage == "demo":
         from demo.server import serve
         serve(cfg, resolve_run(), port=args.port)
+    elif args.stage == "export-site":
+        from demo.export_static import export_site
+        print(f"[export-site] static demo written to {export_site(cfg, resolve_run())}  (deploy: cd site && vercel --prod)")
 
 
 if __name__ == "__main__":

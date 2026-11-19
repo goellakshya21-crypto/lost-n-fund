@@ -15,6 +15,7 @@ const LIVE = ['approved', 'progress', 'redeemed'];
 const PAYABLE = ['approved', 'progress', 'expired'];
 
 async function api(path, body) {
+  if (window.LNF_STATIC) return window.staticApi(path, body);   // static hosting (Vercel): API runs in the browser
   const opt = body === undefined ? {} : { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) };
   const r = await fetch(path, opt);
   const data = await r.json().catch(() => ({}));
@@ -241,7 +242,7 @@ async function renderOps(root, o) {
       <div>
         <div class="hero-kicker">Lost &amp; Fund · campaign ${fmtDate(o.run.snapshot)} · model ${esc(M.version || '')}</div>
         <h1>${num(L.at_risk)} regulars slipping. Only ${num(shopRoutes)} need an offer.</h1>
-        <div class="hero-actions"><a class="btn primary" href="/report" target="_blank" rel="noopener">Open campaign report</a>
+        <div class="hero-actions"><a class="btn primary" href="${window.LNF_STATIC ? '/report.html' : '/report'}" target="_blank" rel="noopener">Open campaign report</a>
           <button class="btn ghost" id="export">Export approvals for pipeline</button>
           <span class="btn ghost" style="cursor:default">Demo day ${o.run.demo_day + 1} · ${fmtDate(o.run.demo_date)}</span></div>
       </div>
