@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Paytm WinBack</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23002e6e'/%3E%3Ctext x='16' y='22' font-family='Arial' font-weight='900' font-size='16' text-anchor='middle' fill='%2300baf2'%3Ep%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css?v=5">
+</head>
+<body>
+  <header class="top">
+    <div class="top-in">
+      <div class="brand">
+        <span class="ptm on-dark" aria-label="Paytm"><b>pay</b><i>tm</i></span>
+        <span class="brand-div"></span>
+        <div class="brand-prod">WinBack</div>
+      </div>
+      <nav class="tabs" aria-label="Screens">
+        <button class="tab" data-view="ops">Paytm Ops</button>
+        <button class="tab" data-view="merchant">Paytm for Business</button>
+        <button class="tab" data-view="customer">Paytm app</button>
+        <button class="tab" data-view="story">Side by side</button>
+      </nav>
+      <div class="spacer"></div>
+      <button class="btn-reset" id="reset" title="Clear all approvals, payments and the demo clock">Reset demo</button>
+    </div>
+  </header>
+  <div class="steps"><div class="steps-in" id="steps"></div></div>
+  <main id="view"><div class="empty">Loading…</div></main>
+  <div id="toasts" aria-live="polite"></div>
+  <script src="/static/app.js?v=5"></script>
+</body>
+</html>
