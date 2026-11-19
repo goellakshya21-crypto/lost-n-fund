@@ -238,7 +238,7 @@ def quarter_salt(snapshot: pd.Timestamp) -> str:
 
 
 def in_global_holdout(customer_ids: pd.Series, cfg: dict, snapshot: pd.Timestamp) -> np.ndarray:
-    """~5% of customers get no WinBack offer for the whole quarter (programme-level control).
+    """~5% of customers get no Lost & Fund offer for the whole quarter (programme-level control).
     Hash-based, so the same customers stay out on every run in the quarter."""
     salt = quarter_salt(snapshot)
     share = cfg["campaign"]["global_holdout_share"]
@@ -300,6 +300,6 @@ def assign_holdout(offers: pd.DataFrame, cfg: dict, run_id: str) -> pd.DataFrame
     n = df.groupby(["merchant_id", "needs_merchant_approval"])["customer_id"].transform("size")
     df["group"] = np.where(df["_rank"] < (share * n).round(), "control", "treatment")
     df = df.drop(columns=["_u", "_rank"])
-    df.insert(0, "offer_id", ["WB-" + hashlib.sha1(f"{run_id}|{c}|{m}".encode()).hexdigest()[:10].upper()
+    df.insert(0, "offer_id", ["LF-" + hashlib.sha1(f"{run_id}|{c}|{m}".encode()).hexdigest()[:10].upper()
                               for c, m in zip(df["customer_id"], df["merchant_id"])])
     return df

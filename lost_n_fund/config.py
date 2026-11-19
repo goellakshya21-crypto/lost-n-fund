@@ -49,7 +49,7 @@ DEFAULT_CONFIG: dict = {
     "compliance": {
         "only_process_consented": True,        # customers without consent are not trained on, scored or messaged
         "exclude_minors": True,                # under-18s are never scored or targeted
-        "sensitive_categories": ["pharmacy"],  # never used for WinBack: purchases there can reveal health
+        "sensitive_categories": ["pharmacy"],  # never used for Lost & Fund: purchases there can reveal health
         "merchant_view": "anonymous",          # "anonymous" = counts only (recommended); "named" = first name +
                                                # initial ONLY for customers who agreed to be visible to shops
         "min_customers_per_alert": 5,          # never alert a shop about fewer customers than this
@@ -173,7 +173,7 @@ DEFAULT_CONFIG: dict = {
     },
     "campaign": {
         "holdout_share": 0.20,          # at-risk customers who get NO offer this run (per-campaign control)
-        "global_holdout_share": 0.05,   # customers who get NO WinBack offer all quarter (programme-level control)
+        "global_holdout_share": 0.05,   # customers who get NO Lost & Fund offer all quarter (programme-level control)
         "frequency_cap_days": 21,
         "measurement_days": 90,         # 90 days: in-offer window + what sticks after the offer ends
         "short_window_days": 30,

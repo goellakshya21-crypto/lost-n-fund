@@ -50,7 +50,7 @@ class Data:
 
 def pseudonym(customer_id: str, cfg: dict) -> str:
     """Salted hash used where a record must outlive the personal data (ledger, erasure list)."""
-    salt = cfg["compliance"].get("pseudonym_salt", "winback")
+    salt = cfg["compliance"].get("pseudonym_salt", "lost_n_fund")
     return hashlib.sha256(f"{salt}|{customer_id}".encode()).hexdigest()[:20]
 
 
@@ -80,7 +80,7 @@ def load_data(data_dir: Path, cfg: dict | None = None, today: pd.Timestamp | Non
             f"No transactions.csv in {data_dir}. Run `python run_pipeline.py generate` for demo data.")
     vantage = (cfg or {}).get("platform", {}).get("data_vantage", "both")
     if vantage not in ("payer", "both"):
-        raise ValueError("WinBack needs payer-side data (your app users' payments) to reach customers. "
+        raise ValueError("Lost & Fund needs payer-side data (your app users' payments) to reach customers. "
                          "Set platform.data_vantage to 'payer' or 'both'.")
     issues: list[str] = []
 
@@ -165,7 +165,7 @@ def load_data(data_dir: Path, cfg: dict | None = None, today: pd.Timestamp | Non
 
 
 def eligible_customer_ids(customers: pd.DataFrame, cfg: dict) -> set:
-    """Customers WinBack may process at all: consented to offers and not a minor."""
+    """Customers Lost & Fund may process at all: consented to offers and not a minor."""
     ok = customers["offers_consent"].copy()
     if cfg["compliance"]["exclude_minors"]:
         ok &= ~customers["is_minor"]

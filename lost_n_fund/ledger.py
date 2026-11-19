@@ -217,15 +217,15 @@ class OfferLedger:
         e = self.frame()
         e = e[e["merchant_share"] != 0]
         if e.empty:
-            return pd.DataFrame(columns=["merchant_id", "week_starting", "winback_cashback_netted", "statement_text"])
+            return pd.DataFrame(columns=["merchant_id", "week_starting", "cashback_netted", "statement_text"])
         freq = "W-MON" if period == "weekly" else "D"
         e["week_starting"] = (e["ts"].dt.normalize() - pd.to_timedelta(e["ts"].dt.weekday, unit="D")
                               if freq == "W-MON" else e["ts"].dt.normalize())
         s = e.groupby(["merchant_id", "week_starting"])["merchant_share"].sum().round(2).reset_index()
-        s = s.rename(columns={"merchant_share": "winback_cashback_netted"})
-        s = s[s["winback_cashback_netted"].abs() >= 0.01].reset_index(drop=True)   # refunds can net a week to 0
+        s = s.rename(columns={"merchant_share": "cashback_netted"})
+        s = s[s["cashback_netted"].abs() >= 0.01].reset_index(drop=True)   # refunds can net a week to 0
         s["statement_text"] = [f"Lost & Fund cashback, week of {w:%d %b}: Rs {v:,.2f}" for w, v in
-                               zip(s["week_starting"], s["winback_cashback_netted"])]
+                               zip(s["week_starting"], s["cashback_netted"])]
         return s
 
     def stats(self) -> dict:

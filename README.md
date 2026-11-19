@@ -75,7 +75,7 @@ accepts.
 
 ## How it works
 
-**1. Shop-level lapse model** ([features.py](winback/features.py), [model.py](winback/model.py))
+**1. Shop-level lapse model** ([features.py](lost_n_fund/features.py), [model.py](lost_n_fund/model.py))
 - *Unit:* a customer × shop pair where the customer is a regular (3+ visits in 90 days, last within 45 days).
 - *Target:* the customer's spend at that shop in the next 30 days falls below 30% of their usual.
   **88% of shop lapsers are still active on the app**, so an "app churn" model would call them safe.
@@ -94,7 +94,7 @@ accepts.
   if it isn't worse on the new validation snapshot; otherwise it runs as a **shadow**. Campaigns report
   **input drift** (PSI per feature) and the shadow model's agreement.
 
-**2. Why are they fading, and who pays?** ([diagnosis.py](winback/diagnosis.py))
+**2. Why are they fading, and who pays?** ([diagnosis.py](lost_n_fund/diagnosis.py))
 
 | Cause | Signal | Action | Who pays |
 |---|---|---|---|
@@ -112,14 +112,14 @@ run: it gets the cause right for 63% of truly-leaving pairs, and **44% of shop-f
 moved shop or stopped for an unseen reason**. Before the diagnosis, the shop would have paid for every
 at-risk customer.
 
-**3. Eligibility and anti-abuse** ([offers.py](winback/offers.py)). These checks run before randomisation, so
+**3. Eligibility and anti-abuse** ([offers.py](lost_n_fund/offers.py)). These checks run before randomisation, so
 the holdout and the shop counts only contain people who could really get an offer:
 - account at least 60 days old, and a regular at that shop for at least 30 days
 - a 21-day frequency cap, and **at most 2 win-back offers per 180 days**; the second is worth half
   (going quiet on purpose doesn't pay)
 - a hash-based **global holdout** (5% of customers get nothing all quarter)
 
-**4. Offer engine** ([offers.py](winback/offers.py)). Offers are **cashback**:
+**4. Offer engine** ([offers.py](lost_n_fund/offers.py)). Offers are **cashback**:
 
 | Type | Example | Used for |
 |---|---|---|
@@ -153,7 +153,7 @@ the holdout and the shop counts only contain people who could really get an offe
   21 days) until the shop has enough.
 - 20% of customers at each shop are held out this run (hash-based, stratified by shop).
 
-**6. Messages** ([messaging.py](winback/messaging.py))
+**6. Messages** ([messaging.py](lost_n_fund/messaging.py))
 - *To the shop:*
   - a **count band** ("5–9"), never an exact count
   - bill and visit ranges only for groups of 10+
@@ -167,7 +167,7 @@ the holdout and the shop counts only contain people who could really get an offe
   - real dates, an opt-out line, and "why am I seeing this"
   - shown at Scan & Pay too, so it works even if the push never arrives
 
-**7. Money movement** ([ledger.py](winback/ledger.py)). Every payment goes through the ledger, which:
+**7. Money movement** ([ledger.py](lost_n_fund/ledger.py)). Every payment goes through the ledger, which:
 - credits cashback only for successful payments made with our app by someone who still consents,
   inside the validity window and at or above the minimum bill
 - counts **one qualifying payment per day** (no bill splitting)
@@ -177,7 +177,7 @@ the holdout and the shop counts only contain people who could really get an offe
 - is **idempotent** on payment IDs
 - writes **one netting line per shop per week**
 
-**8. Measurement and learning** ([measure.py](winback/measure.py))
+**8. Measurement and learning** ([measure.py](lost_n_fund/measure.py))
 - *Intent-to-treat*, adjusted for pre-period behaviour (**CUPED**), with **standard errors clustered by shop**.
 - *Approved shops only:* also unbiased, because customers are randomised within each shop.
 - *Did it stick?* "Came back within 30 days" counts the discounted visit itself. What matters is
@@ -189,7 +189,7 @@ the holdout and the shop counts only contain people who could really get an offe
   and **shrunk toward the prior** by sample size, so one small run barely moves them. They are never
   learned from simulated runs (unless `allow_simulated_learning`).
 
-**9. Kill switches** ([monitoring.py](winback/monitoring.py)). If the last measured run breached
+**9. Kill switches** ([monitoring.py](lost_n_fund/monitoring.py)). If the last measured run breached
 **opt-outs >3%**, **complaints >0.5%** or **budget burn >100%**, `campaign` refuses to run until someone
 investigates (`--force` overrides). Low shop approval and input drift are printed as warnings.
 
@@ -210,7 +210,7 @@ investigates (`--force` overrides). Low shop approval and input drift are printe
 
 ## Compliance
 
-All settings are in `compliance` in [winback/config.py](winback/config.py). Legal sign-off from the
+All settings are in `compliance` in [lost_n_fund/config.py](lost_n_fund/config.py). Legal sign-off from the
 platform and its partner PSP banks is still required.
 
 | Rule | How Lost & Fund handles it |
@@ -270,25 +270,23 @@ python run_pipeline.py erase --customers ids.csv
 
 ## Layout
 
-The code package is still called `winback` (the product's earlier working name).
-
 ```
 run_pipeline.py          CLI
-winback/config.py        every knob (compliance, diagnosis, routing, offers, abuse, guardrails)
-winback/data.py          data contract, validation, erasure suppression
-winback/synthetic.py     demo data with hidden causes + 90-day outcome simulator (demo only)
-winback/features.py      customer x shop features, BG/NBD, labels, reason codes
-winback/model.py         train, calibrate, registry + promotion, drift, shadow scoring
-winback/diagnosis.py     why they're fading -> route + who pays (+ truth check on demo data)
-winback/matching.py      at-risk selection, carry-over, action queues, offer candidates
-winback/offers.py        eligibility + anti-abuse, cashback design + economics, budgets, anonymity, holdouts
-winback/uplift.py        T-learner uplift model from measured campaigns
-winback/messaging.py     shop alerts (bands, ranges), autopilot, customer messages, weekly summaries
-winback/ledger.py        redemption rules, refunds, weekly settlement netting
-winback/measure.py       CUPED + clustered effects, power, pooled pilot, learned assumptions
-winback/monitoring.py    programme health + kill switches
-winback/report.py        HTML report
-winback/pipeline.py      stages
+lost_n_fund/config.py        every knob (compliance, diagnosis, routing, offers, abuse, guardrails)
+lost_n_fund/data.py          data contract, validation, erasure suppression
+lost_n_fund/synthetic.py     demo data with hidden causes + 90-day outcome simulator (demo only)
+lost_n_fund/features.py      customer x shop features, BG/NBD, labels, reason codes
+lost_n_fund/model.py         train, calibrate, registry + promotion, drift, shadow scoring
+lost_n_fund/diagnosis.py     why they're fading -> route + who pays (+ truth check on demo data)
+lost_n_fund/matching.py      at-risk selection, carry-over, action queues, offer candidates
+lost_n_fund/offers.py        eligibility + anti-abuse, cashback design + economics, budgets, anonymity, holdouts
+lost_n_fund/uplift.py        T-learner uplift model from measured campaigns
+lost_n_fund/messaging.py     shop alerts (bands, ranges), autopilot, customer messages, weekly summaries
+lost_n_fund/ledger.py        redemption rules, refunds, weekly settlement netting
+lost_n_fund/measure.py       CUPED + clustered effects, power, pooled pilot, learned assumptions
+lost_n_fund/monitoring.py    programme health + kill switches
+lost_n_fund/report.py        HTML report
+lost_n_fund/pipeline.py      stages
 demo/server.py           demo API on the latest run (uses the real ledger)
 demo/static/             Paytm Ops, Paytm for Business, Paytm app screens (plain HTML/JS/CSS)
 ```

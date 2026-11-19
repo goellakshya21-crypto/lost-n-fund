@@ -1,4 +1,4 @@
-"""WinBack pipeline: find regulars slipping away from a shop -> diagnose why -> route to the right fix and
+"""Lost & Fund pipeline: find regulars slipping away from a shop -> diagnose why -> route to the right fix and
 funder -> cashback offer -> measure against holdouts.
 
 Examples
@@ -18,8 +18,8 @@ from __future__ import annotations
 import argparse
 import sys
 
-from winback.config import load_config
-from winback.pipeline import (stage_all, stage_campaign, stage_decide, stage_erase, stage_generate, stage_measure,
+from lost_n_fund.config import load_config
+from lost_n_fund.pipeline import (stage_all, stage_campaign, stage_decide, stage_erase, stage_generate, stage_measure,
                               stage_purge, stage_train, stage_train_uplift)
 
 
@@ -31,7 +31,7 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("stage", choices=["all", "generate", "train", "train-uplift", "campaign", "decide", "measure",
                                       "demo", "purge", "erase"])
-    ap.add_argument("--config", help="JSON file overriding winback/config.py defaults")
+    ap.add_argument("--config", help="JSON file overriding lost_n_fund/config.py defaults")
     ap.add_argument("--snapshot", help="scoring date YYYY-MM-DD (default: day after last transaction)")
     ap.add_argument("--run", help="campaign folder for decide/measure/demo (default: latest)")
     ap.add_argument("--decisions", help="CSV of merchant decisions: merchant_id,decision (or offer_id,decision)")

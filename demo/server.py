@@ -26,10 +26,10 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from winback.config import load_config
-from winback.diagnosis import ACTION_LABELS, REASON_LABELS
-from winback.ledger import OfferLedger
-from winback.messaging import WHY_TEXT, count_band, mask_name, merchant_texts, offer_mix_text, offer_terms
+from lost_n_fund.config import load_config
+from lost_n_fund.diagnosis import ACTION_LABELS, REASON_LABELS
+from lost_n_fund.ledger import OfferLedger
+from lost_n_fund.messaging import WHY_TEXT, count_band, mask_name, merchant_texts, offer_mix_text, offer_terms
 
 STATIC = Path(__file__).resolve().parent / "static"
 
@@ -352,7 +352,7 @@ class Store:
                 "decided_via": self._decided_via(mid),
                 "results": {"came_back_band": count_band(came_back, [1, 5, 10, 20]) if came_back else "0",
                             "sales": round(sum(x["amount"] for x in pays), 2),
-                            "cashback_netted": round(float(lines["winback_cashback_netted"].sum()) if len(lines) else 0.0, 2)},
+                            "cashback_netted": round(float(lines["cashback_netted"].sum()) if len(lines) else 0.0, 2)},
                 "statements": _records(lines[["week_starting", "statement_text"]]) if len(lines) else [],
             },
             "presenter": {"exact_customers": int(len(g)), "holdout_n": int((allm["group"] == "control").sum()),
