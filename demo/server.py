@@ -4,7 +4,7 @@
 
 Three screens share one live state:
   Paytm Ops (P)   at-risk customer-shop pairs, WHY they are slipping and who acts, live KPIs, activity
-  Merchant (A)    the WinBack alert: a count band, a budget, cautious numbers; approve / decline / autopilot
+  Merchant (A)    the Lost & Fund alert: a count band, a budget, cautious numbers; approve / decline / autopilot
   Customer (B)    the offer in their language; pay the full bill, cashback credited by the live ledger
 
 Every payment goes through the same OfferLedger the pipeline uses (min bill, one per day, streaks,
@@ -317,7 +317,7 @@ class Store:
     def merchant_detail(self, mid: str) -> dict:
         """'app' is exactly what the shop's app receives (bands, budget, statements). 'presenter' is ops-only."""
         if mid not in self.alerts:
-            raise HTTPException(404, "no WinBack alert for this shop")
+            raise HTTPException(404, "no Lost & Fund alert for this shop")
         al = self.alerts[mid]
         m = self.merchants.loc[mid]
         g = self.assign[(self.assign["merchant_id"] == mid) & (self.assign["group"] == "treatment")
@@ -366,7 +366,7 @@ class Store:
             raise HTTPException(400, "decision must be 'approve' or 'decline'")
         with self.lock:
             if mid not in self.alerts:
-                raise HTTPException(404, "no WinBack alert for this shop")
+                raise HTTPException(404, "no Lost & Fund alert for this shop")
             val = "approved" if choice == "approve" else "rejected"
             autopilot = bool(self.merchants.loc[mid, "auto_approve"])
             if self.state["decisions"].get(mid) == val or (val == "approved" and autopilot and mid not in self.state["decisions"]):
@@ -413,7 +413,7 @@ class Store:
     def customer_detail(self, cid: str) -> dict:
         oid = self.by_customer.get(cid)
         if not oid:
-            raise HTTPException(404, "customer has no WinBack offer")
+            raise HTTPException(404, "customer has no Lost & Fund offer")
         r0 = self.assign.loc[oid]
         risk = self.risk.loc[cid] if cid in self.risk.index else None
         return {
@@ -501,7 +501,7 @@ class Store:
                 self.state["opt_outs"][cid] = str(ts)
                 self.ledger.opt_out(cid, ts)
                 r = self.assign.loc[self.by_customer[cid]]
-                self._event("optout", f"{r['masked']} turned off WinBack offers. The offer stopped at once and they are "
+                self._event("optout", f"{r['masked']} turned off Lost & Fund offers. The offer stopped at once and they are "
                                       "excluded from all future runs.")
                 self._save()
         return self.customer_detail(cid)
@@ -537,7 +537,7 @@ class Store:
 def create_app(cfg: dict | None = None, run_dir: Path | None = None) -> FastAPI:
     cfg = cfg or load_config()
     store = Store(cfg, Path(run_dir) if run_dir else latest_run(cfg))
-    app = FastAPI(title="WinBack demo", docs_url="/api/docs")
+    app = FastAPI(title="Lost & Fund demo", docs_url="/api/docs")
 
     @app.middleware("http")
     async def no_cache(request, call_next):
@@ -618,5 +618,5 @@ def serve(cfg: dict, run_dir: Path | None = None, host: str = "127.0.0.1", port:
     import uvicorn
 
     app = create_app(cfg, run_dir)
-    print(f"[demo] WinBack demo running at http://{host}:{port}   (Ctrl+C to stop)", flush=True)
+    print(f"[demo] Lost & Fund demo running at http://{host}:{port}   (Ctrl+C to stop)", flush=True)
     uvicorn.run(app, host=host, port=port, log_level="warning")

@@ -219,7 +219,7 @@ def build_report(run_dir: Path, cfg: dict) -> Path:
         banner = ('<div class="banner"><b>Demo run.</b> Customers, shops and payments are synthetic, and the '
                   f'{cfg["campaign"]["measurement_days"]} days after the campaign are simulated. The pipeline code is the '
                   'same one that runs on real data; only the inputs change.</div>')
-    parts.append(f"""<h1>WinBack: campaign report</h1>
+    parts.append(f"""<h1>Lost &amp; Fund: campaign report</h1>
 <p class="sub">Run <code>{_e(summary['run_id'])}</code> · scored on {_e(summary['snapshot'])} with model
 <code>{_e(summary['model']['version'])}</code> · measured {_e(results['measurement_window'][0])} to
 {_e(results['measurement_window'][1])}</p>{banner}
@@ -496,9 +496,9 @@ at most one offer per {cfg['campaign']['frequency_cap_days']} days and {cfg['abu
                  + " · ".join(f"<code>{_e(x)}</code>" for x in files) + "</p></section>")
 
     doc = (f"<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\">"
-           f"<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>WinBack Campaign Report</title>"
+           f"<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>Lost &amp; Fund Campaign Report</title>"
            f"<style>{CSS}</style></head><body><header class=\"brandbar\"><div><span class=\"ptm\"><b>pay</b><i>tm</i></span>"
-           f"<span class=\"t\">WinBack · campaign report</span></div></header><main>{''.join(parts)}</main><div id=\"tip\"></div>"
+           f"<span class=\"t\">Lost &amp; Fund · campaign report</span></div></header><main>{''.join(parts)}</main><div id=\"tip\"></div>"
            f"<script>{JS}</script></body></html>")
     out = run_dir / "report.html"
     out.write_text(doc, encoding="utf-8")

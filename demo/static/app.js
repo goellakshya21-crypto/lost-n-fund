@@ -1,5 +1,5 @@
 'use strict';
-/* WinBack demo: Paytm Ops (P), Merchant app (A), Customer app (B), sharing one live state on the server. */
+/* Lost & Fund demo: Paytm Ops (P), Merchant app (A), Customer app (B), sharing one live state on the server. */
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
@@ -239,7 +239,7 @@ async function renderOps(root, o) {
   root.innerHTML = `
     <section class="hero"><div class="hero-in">
       <div>
-        <div class="hero-kicker">WinBack · campaign ${fmtDate(o.run.snapshot)} · model ${esc(M.version || '')}</div>
+        <div class="hero-kicker">Lost &amp; Fund · campaign ${fmtDate(o.run.snapshot)} · model ${esc(M.version || '')}</div>
         <h1>${num(L.at_risk)} regulars slipping. Only ${num(shopRoutes)} need an offer.</h1>
         <div class="hero-actions"><a class="btn primary" href="/report" target="_blank" rel="noopener">Open campaign report</a>
           <button class="btn ghost" id="export">Export approvals for pipeline</button>
@@ -327,7 +327,7 @@ function merchantPhone(full) {
   const d = full.app, m = d.merchant, s = d.segment, R = d.results;
   const lang = S.lang[m.merchant_id] || m.language;
   const t = d.texts[lang] || d.texts.en;
-  const result = d.decision === 'approved' ? `<div class="result-card"><div class="rc-title">Your WinBack results so far</div><div class="rc-grid g3">
+  const result = d.decision === 'approved' ? `<div class="result-card"><div class="rc-title">Your Lost &amp; Fund results so far</div><div class="rc-grid g3">
       <div><b>${esc(R.came_back_band)}</b><small>regulars came back</small></div><div><b>${rs(R.sales)}</b><small>sales from them</small></div>
       <div><b>${rs(R.cashback_netted)}</b><small>cashback netted</small></div></div></div>` : '';
   const ranges = s.typical_bill_range ? `<div class="seg-grid">
@@ -371,7 +371,7 @@ function merchantPhone(full) {
       <div class="soundbox"><span class="sbx"></span><div class="t grow"><b>Soundbox</b><small>● Online</small></div>
         <button class="sound" data-say="${esc(t.voice)}">${ICON.speaker} Play alert</button></div>
       <div class="alert-card">
-        <div class="alert-top"><span class="ic">${ICON.bell}</span><b>WinBack alert</b>
+        <div class="alert-top"><span class="ic">${ICON.bell}</span><b>Lost &amp; Fund alert</b>
           ${d.autopilot ? '<span class="mini-pill">autopilot</span>' : ''}${d.cofunded ? '<span class="mini-pill">co-funded</span>' : ''}
           <span class="lang"><button data-lang="hi" class="${lang === 'hi' ? 'on' : ''}">Hinglish</button><button data-lang="en" class="${lang === 'en' ? 'on' : ''}">English</button></span></div>
         <p>${esc(t.short || t.message)}</p>
@@ -465,7 +465,7 @@ function preview(o, amt) {
     const c = Math.round(Math.min(o.pct / 100 * amt, o.cap) * 100) / 100;
     return { kind: 'cash', cash: c, text: `${o.pct}% cashback` };
   }
-  return { kind: 'cash', cash: o.cashback, text: 'WinBack cashback' };
+  return { kind: 'cash', cash: o.cashback, text: 'Lost & Fund cashback' };
 }
 
 function breakdown(o, amt) {
@@ -496,7 +496,7 @@ function customerPhone(d) {
       <div class="scroll pay-body">
         <div class="m-avatar">${initials(o.merchant_name)}</div>
         <div class="m-name">Paying ${esc(o.merchant_name)}</div>
-        <div class="scan-offer">${ICON.gift}<span>WinBack: ${esc(headline(o))} · ${esc(subline(o))}</span></div>
+        <div class="scan-offer">${ICON.gift}<span>Lost &amp; Fund: ${esc(headline(o))} · ${esc(subline(o))}</span></div>
         <div class="amount"><span>₹</span><input id="amt" type="number" inputmode="decimal" min="1" step="1" value="${amt}" aria-label="Bill amount"></div>
         <div class="amt-chips">${[100, Math.round(o.min_bill), 300, 500].filter((v, i, a) => a.indexOf(v) === i).sort((a, b) => a - b)
           .map(v => `<button data-amt="${v}">${rs(v)}</button>`).join('')}</div>
@@ -545,7 +545,7 @@ function customerPhone(d) {
 
   const offer = live
     ? `<div class="offer-card ${pr.finished ? 'used' : ''}">
-        <div class="oc-band"><div class="oc-top"><span class="oc-badge">WINBACK · ${o.funder === 'paytm' ? 'FROM PAYTM' : 'CASHBACK'}</span><span class="oc-valid">Valid till ${fmtDate(o.valid_till)}</span></div>
+        <div class="oc-band"><div class="oc-top"><span class="oc-badge">LOST &amp; FUND · ${o.funder === 'paytm' ? 'FROM PAYTM' : 'CASHBACK'}</span><span class="oc-valid">Valid till ${fmtDate(o.valid_till)}</span></div>
           <div class="oc-pct">${esc(headline(o))}</div><div class="oc-m">${esc(subline(o))}</div></div>
         <div class="oc-body">
           <div class="oc-shop"><span class="avatar">${initials(o.merchant_name)}</span><div class="grow"><b>${esc(o.merchant_name)}</b>
@@ -555,7 +555,7 @@ function customerPhone(d) {
           <button class="btn primary block" id="paynow" ${pr.finished ? 'disabled' : ''}>${pr.finished ? 'Cashback received' : `Pay at ${esc(o.merchant_name)}`}</button>
           <div class="oc-links"><button class="linkbtn" id="why">Why am I seeing this?</button><button class="linkbtn" id="optout">Stop these offers</button></div>
           ${S.cust.why ? `<div class="why-text">${esc(o.why)}</div>` : ''}</div></div>`
-    : `<div class="empty-offer">${d.opted_out ? 'You turned off offers based on your payments. Turn them back on any time in Settings > Offers.' : o && o.status === 'redeemed' ? 'You got your WinBack cashback. Thanks for coming back!' : 'No offers right now'}</div>`;
+    : `<div class="empty-offer">${d.opted_out ? 'You turned off offers based on your payments. Turn them back on any time in Settings > Offers.' : o && o.status === 'redeemed' ? 'You got your Lost &amp; Fund cashback. Thanks for coming back!' : 'No offers right now'}</div>`;
 
   const push = live && !pr.finished && S.cust.banner
     ? `<div class="push" id="push"><div class="push-app"><i>p</i>Paytm · now</div><b>${esc(o.title)}</b><p>${esc(o.terms)}</p></div>` : '';
@@ -593,7 +593,7 @@ function wireCustomer(root, d, rerender) {
   const push = $('#push', root); if (push) push.onclick = toPay;
   const pn = $('#paynow', root); if (pn) pn.onclick = toPay;
   // the offer also shows when they scan that shop's QR, so it works even if the push never arrived
-  $$('#scan, #scan2', root).forEach(b => b.onclick = () => live ? toPay() : toast('In this demo, Scan & Pay opens the shop with a live WinBack offer.'));
+  $$('#scan, #scan2', root).forEach(b => b.onclick = () => live ? toPay() : toast('In this demo, Scan & Pay opens the shop with a live Lost & Fund offer.'));
   const scratch = $('#scratch', root);
   if (scratch) scratch.onclick = () => { scratch.classList.add('revealed'); S.cust.scratched = true; };
   $$('[data-deco]', root).forEach(b => b.onclick = () => toast('Not part of this demo'));
@@ -612,7 +612,7 @@ function wireCustomer(root, d, rerender) {
   if (why) why.onclick = () => { S.cust.why = !S.cust.why; rerender(); };
   const opt = $('#optout', root);
   if (opt) opt.onclick = async () => {
-    if (!confirm('Stop WinBack offers? Paytm will stop using your payments to send you these offers.')) return;
+    if (!confirm('Stop Lost & Fund offers? Paytm will stop using your payments to send you these offers.')) return;
     try {
       await api(`/api/customers/${d.customer.customer_id}/opt-out`, {});
       S.cust.banner = false;

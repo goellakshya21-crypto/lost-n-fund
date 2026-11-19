@@ -115,25 +115,25 @@ def merchant_texts(owner_first: str, band: str, mix: str, exp_cost: int, budget_
     return {
         "hi": {
             # one line for the app card (budget, cost and sales sit in tiles right below it)
-            "short": (f"Aapke {band} regular grahak kam aa rahe hain. Unhe WinBack cashback bhejein? "
+            "short": (f"Aapke {band} regular grahak kam aa rahe hain. Unhe Lost & Fund cashback bhejein? "
                       f"Paytm grahak chunega, naam aapko nahi dikhenge."),
             "message": (f"Namaste {owner_first} ji! Aapke {band} regular grahak kuch dinon se kam aa rahe hain. "
-                        f"Unhe WinBack cashback bhejein ({mix})? Paytm khud grahak chunega aur message karega "
+                        f"Unhe Lost & Fund cashback bhejein ({mix})? Paytm khud grahak chunega aur message karega "
                         f"(aapko naam ya number nahi dikhenge). Budget zyada se zyada {_rs(budget_cap)}; "
                         f"anumanit kharcha lagbhag {_rs(exp_cost)}{co_hi}. Extra bikri ka andaaza: {_rs(sales[0])}-"
                         f"{sales[1]:,}/mahina. Cashback hafte mein ek baar settlement se katega.{ap_hi} "
-                        f"Approve karein: Paytm for Business > WinBack."),
-            "voice": "Paytm alert. Aapke kuch purane grahakon ke liye WinBack offer taiyaar hai. App mein dekhein.",
+                        f"Approve karein: Paytm for Business > Lost & Fund."),
+            "voice": "Paytm alert. Aapke kuch purane grahakon ke liye Lost and Fund offer taiyaar hai. App mein dekhein.",
         },
         "en": {
-            "short": f"{band} of your regulars are coming less. Send them WinBack cashback? Paytm picks them; you won't see names.",
+            "short": f"{band} of your regulars are coming less. Send them Lost & Fund cashback? Paytm picks them; you won't see names.",
             "message": (f"Hi {owner_first}! {band} of your regular customers have been coming less. "
-                        f"Send them WinBack cashback ({mix})? Paytm picks and notifies them "
+                        f"Send them Lost & Fund cashback ({mix})? Paytm picks and notifies them "
                         f"(you won't see names or numbers). Budget up to {_rs(budget_cap)}; expected cost about "
                         f"{_rs(exp_cost)}{co_en}. Likely extra sales: {_rs(sales[0])}-{sales[1]:,}/month. "
                         f"Cashback is netted from your settlement once a week.{ap_en} "
-                        f"Approve in Paytm for Business > WinBack."),
-            "voice": "Paytm alert. A WinBack offer for some of your regular customers is ready. Please check the app.",
+                        f"Approve in Paytm for Business > Lost & Fund."),
+            "voice": "Paytm alert. A Lost and Fund offer for some of your regular customers is ready. Please check the app.",
         },
     }
 
@@ -339,11 +339,11 @@ def weekly_merchant_summaries(board: pd.DataFrame, merchants: pd.DataFrame, cfg:
         lang = mm["language"] if mm["language"] in ("hi", "en") else "en"
         suggest = (not bool(mm["auto_approve"])) and r.came_back > 0
         if lang == "hi":
-            text = (f"WinBack: {band} purane grahak wapas aaye, unse {_rs(r.sales_from_these_customers)} ki bikri. "
+            text = (f"Lost & Fund: {band} purane grahak wapas aaye, unse {_rs(r.sales_from_these_customers)} ki bikri. "
                     f"Cashback {_rs(r.cashback_netted)} settlement se kata."
                     + (" Autopilot on karein: budget ek baar set karein, baaki Paytm sambhalega." if suggest else ""))
         else:
-            text = (f"WinBack: {band} regulars came back, {_rs(r.sales_from_these_customers)} in sales from them. "
+            text = (f"Lost & Fund: {band} regulars came back, {_rs(r.sales_from_these_customers)} in sales from them. "
                     f"Cashback {_rs(r.cashback_netted)} netted from your settlement."
                     + (" Turn on autopilot: set a monthly budget once and Paytm handles the rest." if suggest else ""))
         out.append({"merchant_id": r.merchant_id, "language": lang, "text": text,

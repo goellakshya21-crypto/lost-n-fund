@@ -4,7 +4,7 @@ How the money moves (no change at the counter):
   1. The customer pays the FULL bill with the app. The Soundbox announces the full amount.
   2. If the payment qualifies, the app credits cashback to the customer at once.
   3. The shop's share of that cashback is netted from its settlement as ONE line per week
-     ("WinBack cashback this week: Rs 240"). There is no per-payment marker, so the shopkeeper
+     ("Lost & Fund cashback this week: Rs 240"). There is no per-payment marker, so the shopkeeper
      can't tell which customer was picked. Paytm-funded cashback never touches the shop.
 
 Rules checked at every payment (anti-abuse and fairness):
@@ -224,7 +224,7 @@ class OfferLedger:
         s = e.groupby(["merchant_id", "week_starting"])["merchant_share"].sum().round(2).reset_index()
         s = s.rename(columns={"merchant_share": "winback_cashback_netted"})
         s = s[s["winback_cashback_netted"].abs() >= 0.01].reset_index(drop=True)   # refunds can net a week to 0
-        s["statement_text"] = [f"WinBack cashback, week of {w:%d %b}: Rs {v:,.2f}" for w, v in
+        s["statement_text"] = [f"Lost & Fund cashback, week of {w:%d %b}: Rs {v:,.2f}" for w, v in
                                zip(s["week_starting"], s["winback_cashback_netted"])]
         return s
 
