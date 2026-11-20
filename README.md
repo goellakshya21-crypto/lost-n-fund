@@ -2,6 +2,8 @@
 
 *The lost regular is found, and the shop funds the reunion.*
 
+**Pitch deck:** [lost-n-fund.vercel.app/pitch](https://lost-n-fund.vercel.app/pitch) · **Live demo:** [lost-n-fund.vercel.app](https://lost-n-fund.vercel.app)
+
 **The idea.** A payments app (Paytm, PhonePe, Google Pay, BHIM...) sees that customer **B** has
 stopped coming to shop **A**, where B used to be a regular. It works out **why**, and acts only when
 an offer can actually help:
@@ -79,6 +81,9 @@ Live at **https://lost-n-fund.vercel.app**. It's a static copy: a snapshot of th
 the demo API and the cashback ledger running in the browser (same rules as the Python ledger). Each
 viewer's clicks stay in their own browser, and "Reset demo" clears them. The header says it is a concept
 demo not affiliated with Paytm, and search engines are told not to index it.
+
+The pitch deck ([pitch/index.html](pitch/index.html), a single HTML file) is served from the same site at
+**https://lost-n-fund.vercel.app/pitch**. `export-site` copies it in, so edit `pitch/index.html` and redeploy.
 
 To publish a new run:
 

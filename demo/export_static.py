@@ -7,6 +7,7 @@ The live demo is a FastAPI server; static hosts can't run it. This writes:
   site/static/api-static.js        the demo API + offer ledger, in the browser (state in localStorage)
   site/data/demo.json              a snapshot of the latest campaign run (synthetic data only)
   site/report.html                 the campaign report
+  site/pitch/index.html            the pitch deck (copied from pitch/), served at /pitch
 Every viewer gets their own demo state; "Reset demo" clears it.
 """
 from __future__ import annotations
@@ -116,6 +117,10 @@ def export_site(cfg: dict, run_dir: Path | None = None, out_dir: Path | None = N
     report = run_dir / "report.html"
     if report.exists():
         shutil.copyfile(report, out / "report.html")
+    pitch = PROJECT_ROOT / "pitch" / "index.html"
+    if pitch.exists():
+        (out / "pitch").mkdir(exist_ok=True)
+        shutil.copyfile(pitch, out / "pitch" / "index.html")
     snap = build_snapshot(st)
     (out / "data" / "demo.json").write_text(json.dumps(snap, separators=(",", ":"), ensure_ascii=False), encoding="utf-8")
     (out / "vercel.json").write_text(json.dumps({

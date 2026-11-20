@@ -1,0 +1,531 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lost &amp; Fund Pitch</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: a fixed 1280x720 stage scaled to the window; one slide at a time; a yellow "claim tag" (lost-property office) numbers each slide.
+   Numbers rule: the only figures on these slides are public ones with a source (listed on the last slide). Nothing from the simulator. */
+:root {
+  --paper: #e9eef6;   /* around the stage */
+  --slide: #fbfcfe;   /* slide surface */
+  --ink: #0b1b3f;
+  --ink-2: #47557a;
+  --muted: #7a87a3;
+  --rule: #dbe2ee;
+  --shop: #0f86c9;    /* shop pays (also the brand accent) */
+  --split: #b97f00;   /* shop + Paytm */
+  --paytm: #4b3fc0;   /* Paytm pays */
+  --none: #bcc5d4;    /* no offer */
+  --tag: #ffd24a;     /* claim-tag yellow */
+  --tag-ink: #2b2100;
+  --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #060b16; --slide: #0d1628; --ink: #e9eef8; --ink-2: #b3bfd6; --muted: #8592ad; --rule: #22304a;
+    --shop: #2a9fd8; --split: #be8b22; --paytm: #8279e6; --none: #3a475f; --tag: #f2c230; --tag-ink: #241b00;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #060b16; --slide: #0d1628; --ink: #e9eef8; --ink-2: #b3bfd6; --muted: #8592ad; --rule: #22304a;
+  --shop: #2a9fd8; --split: #be8b22; --paytm: #8279e6; --none: #3a475f; --tag: #f2c230; --tag-ink: #241b00;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-body); overflow: hidden;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+a { color: var(--shop); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+
+/* ---------- stage ---------- */
+.viewport { position: fixed; inset: 0; }
+.stage { position: absolute; left: 50%; top: 50%; width: 1280px; height: 720px; transform-origin: center center;
+  background: var(--slide); border-radius: 18px; box-shadow: 0 30px 80px rgba(11, 27, 63, .16); overflow: hidden; }
+.slide { position: absolute; inset: 0; padding: 64px 80px 56px; display: flex; flex-direction: column; gap: 22px;
+  visibility: hidden; opacity: 0; transition: opacity .35s ease, visibility 0s linear .35s; }
+.slide.active { visibility: visible; opacity: 1; transition: opacity .35s ease; }
+.claim { position: absolute; top: 34px; right: 40px; font: 700 13px/1 var(--font-mono); letter-spacing: .08em;
+  background: var(--tag); color: var(--tag-ink); padding: 8px 12px 8px 26px; border-radius: 6px; transform: rotate(2deg); }
+.claim::before { content: ""; position: absolute; left: 9px; top: 50%; width: 8px; height: 8px; margin-top: -4px;
+  border-radius: 50%; background: var(--slide); }
+.eyebrow { font: 700 14px/1 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--shop); }
+h1, h2, h3 { font-family: var(--font-display); margin: 0; text-wrap: balance; letter-spacing: -.02em; }
+h2 { font-size: 50px; line-height: 1.05; font-weight: 800; max-width: 22ch; }
+h3 { font-size: 24px; font-weight: 700; }
+p { margin: 0; font-size: 21px; line-height: 1.5; color: var(--ink-2); max-width: 60ch; }
+.small { font-size: 16px; color: var(--muted); }
+.mark { background: linear-gradient(transparent 68%, color-mix(in srgb, var(--tag) 60%, transparent) 68%); color: var(--ink); padding: 0 2px; }
+.stage.instant .slide { transition: none; }
+.row { display: grid; gap: 40px; flex: 1; min-height: 0; align-items: center; }
+.cols-2 { grid-template-columns: 1fr 1fr; }
+.cols-2-wide { grid-template-columns: 1.05fr 1.25fr; }
+.cols-3 { grid-template-columns: repeat(3, 1fr); align-items: start; flex: 0 0 auto; margin-top: 18px; }
+.cols-3 .card { border-top: 4px solid var(--shop); }
+.cols-3 .card h3 { font-size: 30px; line-height: 1.1; }
+.cols-3 .card p { font-size: 20px; }
+.stack { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.foot { font: 500 13px/1.4 var(--font-mono); color: var(--muted); letter-spacing: .02em; }
+
+/* ---------- cover ---------- */
+.cover { padding: 72px 80px; justify-content: space-between; }
+.cover h1 { font-size: 150px; line-height: .9; font-weight: 800; letter-spacing: -.045em; }
+.cover h1 .amp { color: var(--shop); }
+.cover .sub { font: 600 34px/1.2 var(--font-display); color: var(--ink); max-width: 18ch; letter-spacing: -.01em; }
+.cover-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 40px; align-items: center; flex: 1; }
+.luggage { justify-self: center; width: 330px; padding: 34px 30px 30px; border-radius: 22px 22px 22px 70px;
+  background: var(--tag); color: var(--tag-ink); transform: rotate(-6deg); position: relative;
+  box-shadow: 0 18px 40px rgba(43, 33, 0, .18); }
+.luggage::before { content: ""; position: absolute; top: 22px; right: 26px; width: 26px; height: 26px; border-radius: 50%;
+  background: var(--slide); box-shadow: inset 0 0 0 5px rgba(43, 33, 0, .25); }
+.luggage .k { font: 700 13px/1 var(--font-mono); letter-spacing: .2em; }
+.luggage .big { font: 800 96px/1 var(--font-display); letter-spacing: -.04em; margin: 18px 0 8px; }
+.luggage .t { font: 600 19px/1.35 var(--font-body); }
+.luggage .line { border-top: 2px dashed rgba(43, 33, 0, .35); margin: 18px 0 12px; }
+.luggage .src { color: var(--tag-ink); opacity: .75; margin-top: 12px; }
+
+/* ---------- real, sourced figures ---------- */
+.big small, .fact b small { font-size: .42em; letter-spacing: 0; margin-left: 6px; }
+.facts { display: flex; flex-direction: column; }
+.fact { display: grid; grid-template-columns: 220px 1fr; gap: 22px; align-items: baseline; padding: 18px 0; border-top: 1px solid var(--rule); }
+.fact:last-child { border-bottom: 1px solid var(--rule); }
+.fact b { font: 800 58px/1 var(--font-display); letter-spacing: -.03em; color: var(--shop); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.fact p { font-size: 18px; line-height: 1.4; }
+.src { display: block; margin-top: 6px; font: 700 11px/1.3 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+
+/* ---------- cards, tables, lists ---------- */
+.card { border: 1px solid var(--rule); border-radius: 16px; padding: 26px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.card p { font-size: 18px; }
+table.who { width: 100%; border-collapse: collapse; font-size: 18px; }
+table.who th { text-align: left; font: 700 12px/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted);
+  padding: 0 14px 12px 0; border-bottom: 2px solid var(--ink); }
+table.who td { padding: 14px 14px 14px 0; border-bottom: 1px solid var(--rule); vertical-align: top; color: var(--ink-2); line-height: 1.35; }
+table.who td:first-child { color: var(--ink); font-weight: 700; }
+table.figs td:first-child { white-space: nowrap; }
+.swatch { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 8px; vertical-align: 0; }
+.steps { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; flex: 1; align-items: stretch; }
+.step { border-top: 4px solid var(--ink); padding-top: 18px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.step .num { font: 700 14px/1 var(--font-mono); color: var(--muted); letter-spacing: .1em; }
+.step h3 { font-size: 26px; }
+.step p { font-size: 17px; }
+.step.key { border-top-color: var(--shop); }
+.reasons { display: grid; grid-template-columns: 1fr 1fr; gap: 26px 48px; }
+.reason h3 { font-size: 27px; margin-bottom: 6px; }
+.reason p { font-size: 18px; }
+ul.ticks { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
+ul.ticks li { font-size: 20px; line-height: 1.4; color: var(--ink-2); padding-left: 30px; position: relative; }
+ul.ticks li::before { content: ""; position: absolute; left: 0; top: 9px; width: 14px; height: 8px; border-left: 3px solid var(--shop);
+  border-bottom: 3px solid var(--shop); transform: rotate(-45deg); }
+ul.ticks b { color: var(--ink); }
+ul.ticks.tight { gap: 10px; }
+ul.ticks.tight li { font-size: 18px; }
+
+/* causes grouped by what they trigger */
+.routes { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: start; }
+.route-h { font: 700 12px/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted);
+  padding-bottom: 10px; border-bottom: 2px solid var(--ink); }
+.route { display: grid; grid-template-columns: 12px 1fr; column-gap: 12px; row-gap: 3px; padding: 12px 0; border-bottom: 1px solid var(--rule); }
+.route .swatch { margin: 5px 0 0; grid-row: span 2; }
+.route b { font-size: 18px; line-height: 1.3; color: var(--ink); }
+.route span { font-size: 15px; color: var(--ink-2); }
+
+/* the filters a campaign runs through */
+.gates { display: flex; flex-direction: column; border-left: 3px solid var(--rule); margin-left: 6px; }
+.gate { position: relative; padding: 7px 0 7px 22px; }
+.gate::before { content: ""; position: absolute; left: -8.5px; top: 13px; width: 14px; height: 14px; border-radius: 50%;
+  background: var(--slide); border: 3px solid var(--shop); }
+.gate:last-child::before { background: var(--shop); }
+.gate b { display: block; font: 700 18px/1.25 var(--font-display); color: var(--ink); }
+.gate span { display: block; font-size: 15px; line-height: 1.35; color: var(--ink-2); }
+
+/* holdout diagram */
+.flow { display: flex; flex-direction: column; }
+.fbox { border: 1px solid var(--rule); border-radius: 14px; padding: 16px 18px; font-size: 16px; line-height: 1.4; color: var(--ink-2); background: var(--slide); }
+.fbox b { display: block; font: 700 20px/1.25 var(--font-display); color: var(--ink); margin-bottom: 4px; }
+.fsplit { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.fbox.treat { border-color: var(--shop); box-shadow: inset 5px 0 0 var(--shop); }
+.fbox.hold { border-style: dashed; border-color: var(--muted); box-shadow: inset 5px 0 0 var(--none); }
+.fbox.result { background: var(--ink); border-color: var(--ink); color: var(--slide); }
+.fbox.result b { color: var(--slide); }
+.arrow { width: 2px; height: 30px; margin: 0 auto; background: var(--ink-2); position: relative; }
+.arrow::after { content: ""; position: absolute; left: -5px; bottom: -2px; border-left: 6px solid transparent; border-right: 6px solid transparent;
+  border-top: 8px solid var(--ink-2); }
+
+/* phone mock (the shop's alert): a wireframe, so no example values */
+.mock { width: 420px; justify-self: center; border-radius: 28px; border: 1px solid var(--rule); background: var(--paper); padding: 18px;
+  display: flex; flex-direction: column; gap: 12px; box-shadow: 0 18px 50px rgba(11, 27, 63, .12); }
+.mock .bar { font: 700 15px/1 var(--font-body); color: var(--ink); display: flex; align-items: center; gap: 8px; }
+.mock .bell { width: 24px; height: 24px; border-radius: 7px; background: var(--shop); }
+.mock .wf { margin-left: auto; font: 700 10px/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted);
+  border: 1px dashed var(--muted); border-radius: 5px; padding: 4px 6px; }
+.mock .msg { font-size: 16px; line-height: 1.45; color: var(--ink-2); }
+.mock .tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.mock .tile { background: var(--slide); border: 1px solid var(--rule); border-radius: 12px; padding: 10px; }
+.mock .tile small { display: block; font-size: 11px; color: var(--muted); font-weight: 600; }
+.mock .ph { display: block; height: 14px; width: 72%; margin-top: 10px; border-radius: 4px; background: var(--rule); }
+.mock .band { display: flex; align-items: center; gap: 12px; background: var(--slide); border: 1px solid var(--rule); border-radius: 14px; padding: 12px; }
+.mock .band .ph-band { flex: none; width: 58px; height: 46px; border-radius: 10px; background: color-mix(in srgb, var(--shop) 35%, transparent); }
+.mock .band span { font-size: 15px; font-weight: 600; color: var(--ink); }
+.mock .cta { background: var(--shop); color: var(--slide); text-align: center; font-weight: 700; border-radius: 12px; padding: 13px; font-size: 16px; }
+.mock .stmt { font: 500 13px/1.4 var(--font-mono); color: var(--ink-2); border-top: 1px dashed var(--rule); padding-top: 10px; }
+
+
+/* ---------- controls ---------- */
+.progress { position: fixed; top: env(safe-area-inset-top, 0px); left: 0; right: 0; height: 4px; z-index: 10; background: transparent; }
+.progress i { display: block; height: 100%; background: var(--shop); width: 0; transition: width .3s ease; }
+.nav { position: fixed; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); right: max(18px, env(safe-area-inset-right, 0px)); z-index: 10;
+  display: flex; align-items: center; gap: 8px; background: var(--slide); border: 1px solid var(--rule); border-radius: 999px; padding: 6px;
+  box-shadow: 0 6px 18px rgba(11, 27, 63, .12); }
+.nav button { width: 38px; height: 38px; border-radius: 50%; border: 0; background: var(--paper); color: var(--ink); font: 700 18px/1 var(--font-body); cursor: pointer; }
+.nav button:hover { background: var(--rule); }
+.nav button:focus-visible { outline: 3px solid var(--shop); outline-offset: 2px; }
+.nav button:disabled { opacity: .35; cursor: default; }
+.nav .count { font: 700 13px/1 var(--font-mono); color: var(--ink-2); min-width: 54px; text-align: center; }
+@media (prefers-reduced-motion: reduce) { .slide, .slide.active, .progress i { transition: none; } }
+</style>
+</head>
+<body>
+<div class="progress" aria-hidden="true"><i id="progress"></i></div>
+<div class="viewport">
+<main class="stage" id="stage" aria-live="polite">
+
+  <!-- 1 cover -->
+  <section class="slide cover active" data-title="Cover">
+    <div class="claim">CLAIM No. 01</div>
+    <div class="eyebrow">Concept pitch · UPI payment apps</div>
+    <div class="cover-grid">
+      <div class="stack" style="gap:26px">
+        <h1>Lost <span class="amp">&amp;</span><br>Fund</h1>
+        <div class="sub">Silent churn at the corner shop, found and won back.</div>
+        <p>The lost regular is found, and the shop funds the reunion.</p>
+      </div>
+      <div class="luggage" aria-label="16.1 billion UPI payments to merchants in October 2026, source NPCI">
+        <div class="k">ONE MONTH OF UPI</div>
+        <div class="big">16.1<small>bn</small></div>
+        <div class="t">payments to merchants in October 2026. At a corner shop, each one is a visit. The missing ones are lost regulars.</div>
+        <div class="src">Source: NPCI</div>
+        <div class="line"></div>
+        <div class="k" style="letter-spacing:.08em">FOR PAYTM · PHONEPE · GOOGLE PAY · BHIM</div>
+      </div>
+    </div>
+    <div class="foot">Live demo: lost-n-fund.vercel.app · Code: github.com/goellakshya21-crypto/lost-n-fund</div>
+  </section>
+
+  <!-- 2 problem -->
+  <section class="slide" data-title="The problem">
+    <div class="claim">CLAIM No. 02</div>
+    <div class="eyebrow">The problem</div>
+    <div class="row" style="grid-template-columns:1fr 1.15fr">
+      <div class="stack">
+        <h2>Regulars don't leave loudly</h2>
+        <p>A kirana's best customers drift to another shop, a quick-commerce app or cash. The owner notices weeks later, if ever.
+          The payments app sees the drop in its data and does nothing with it.</p>
+        <p><span class="mark">An app-level churn model calls them safe: they still pay on the app, just not at this shop.</span></p>
+      </div>
+      <div class="stack" style="gap:10px">
+        <h3>The signal is already in the payments</h3>
+        <div class="facts">
+          <div class="fact"><b>63%</b>
+            <p>of UPI's 25.5 bn transactions in October 2026 were payments to merchants.<span class="src">NPCI · UPI ecosystem statistics</span></p></div>
+          <div class="fact"><b>86%</b>
+            <p>of UPI merchant payments in FY2025-26 were under ₹500: small, everyday, repeat buys.<span class="src">Ministry of Finance · PIB, 30 Apr 2026</span></p></div>
+          <div class="fact"><b>1.64<small>crore</small></b>
+            <p>storefronts have a Paytm Soundbox. The visits are already in the data.<span class="src">Paytm · Q2 FY27 results</span></p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 why tools miss it -->
+  <section class="slide" data-title="Why it's missed">
+    <div class="claim">CLAIM No. 03</div>
+    <div class="eyebrow">Why today's tools miss it</div>
+    <h2>Three blind spots</h2>
+    <div class="row cols-3">
+      <div class="card"><h3>Churn models watch the app</h3>
+        <p>They flag people leaving the app. A regular can stop coming to a shop and keep paying on the app everywhere else.</p></div>
+      <div class="card"><h3>Blanket offers pay the wrong people</h3>
+        <p>A regular who is travelling, or on a normal gap for them, comes back anyway. An offer buys nothing there.</p></div>
+      <div class="card"><h3>Shops can't see who left</h3>
+        <p>Sharing a customer's name with the shop would break NPCI and DPDP rules, so the shop can't act alone.</p></div>
+    </div>
+  </section>
+
+  <!-- 4 causes -->
+  <section class="slide" data-title="Why they slip">
+    <div class="claim">CLAIM No. 04</div>
+    <div class="eyebrow">The insight</div>
+    <div class="row cols-2-wide" style="align-items:start">
+      <div class="stack">
+        <h2>Not every slipping regular needs an offer</h2>
+        <p>Each one gets a diagnosed cause, and the cause decides who acts. <span class="mark">Only the causes an offer can fix get one.</span></p>
+        <p class="small">The rest get a payments fix, a wait, an alert to merchant ops, or nothing.</p>
+      </div>
+      <div class="stack">
+        <div class="routes">
+          <div>
+            <div class="route-h">Gets an offer</div>
+            <div class="route"><i class="swatch" style="background:var(--shop)"></i><b>Moved to another shop</b><span>Shop pays</span></div>
+            <div class="route"><i class="swatch" style="background:var(--split)"></i><b>Dropped here only (cash?)</b><span>Shop + Paytm</span></div>
+            <div class="route"><i class="swatch" style="background:var(--paytm)"></i><b>Paying with another app</b><span>Paytm pays</span></div>
+          </div>
+          <div>
+            <div class="route-h">No offer</div>
+            <div class="route"><i class="swatch" style="background:var(--none)"></i><b>Travelling / area quiet</b><span>Wait and recheck</span></div>
+            <div class="route"><i class="swatch" style="background:var(--none)"></i><b>Normal gap for them</b><span>Wait and recheck</span></div>
+            <div class="route"><i class="swatch" style="background:var(--none)"></i><b>Payments failing</b><span>Fix payments</span></div>
+            <div class="route"><i class="swatch" style="background:var(--none)"></i><b>Shop itself declining</b><span>Alert merchant ops</span></div>
+            <div class="route"><i class="swatch" style="background:var(--none)"></i><b>Gone everywhere</b><span>No action</span></div>
+          </div>
+        </div>
+        <div class="small">The causes the model diagnoses, and what each one triggers</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 how it works -->
+  <section class="slide" data-title="How it works">
+    <div class="claim">CLAIM No. 05</div>
+    <div class="eyebrow">How it works</div>
+    <h2>From a payment drop to a measured win-back</h2>
+    <div class="steps">
+      <div class="step"><div class="num">STEP 1</div><h3>Score</h3><p>Every customer-shop pair gets a calibrated chance of lapsing at that shop.</p></div>
+      <div class="step key"><div class="num">STEP 2</div><h3>Diagnose</h3><p>Moved shop, switched app, payments failing, travelling, or a normal gap?</p></div>
+      <div class="step key"><div class="num">STEP 3</div><h3>Route</h3><p>Pick the fix and who pays for it. The fix may be no offer at all.</p></div>
+      <div class="step"><div class="num">STEP 4</div><h3>Offer</h3><p>Cashback sized to the customer's rhythm, sent only if it pays for whoever funds it.</p></div>
+      <div class="step"><div class="num">STEP 5</div><h3>Measure</h3><p>Every run keeps a holdout, so the effect is measured against people who got nothing.</p></div>
+    </div>
+    <p class="small">Uses consented adults only. Pharmacies are excluded. Data stays in India.</p>
+  </section>
+
+  <!-- 6 cashback -->
+  <section class="slide" data-title="Cashback">
+    <div class="claim">CLAIM No. 06</div>
+    <div class="eyebrow">Offer design</div>
+    <h2>Cashback, not a discount at the counter</h2>
+    <div class="reasons">
+      <div class="reason"><h3>Nothing changes at the counter</h3><p>The customer pays the full bill and the Soundbox announces the full amount. No disputes over a short payment.</p></div>
+      <div class="reason"><h3>The shop never sees who</h3><p>Its share comes off its settlement as one weekly line, so no single payment reveals who was picked.</p></div>
+      <div class="reason"><h3>Abuse is easy to stop</h3><p>Paid after the payment clears: minimum bill, one qualifying payment a day, streak days, clawback on refunds.</p></div>
+      <div class="reason"><h3>Any funder can pay</h3><p>The shop, Paytm, or both split one reward. A price cut at the counter can't do that.</p></div>
+    </div>
+  </section>
+
+  <!-- 7 shop view -->
+  <section class="slide" data-title="The shop's view">
+    <div class="claim">CLAIM No. 07</div>
+    <div class="eyebrow">What the shop sees</div>
+    <div class="row cols-2">
+      <div class="mock" aria-label="Wireframe of the shop's alert">
+        <div class="bar"><span class="bell"></span>Lost &amp; Fund alert<span class="wf">Wireframe</span></div>
+        <div class="msg">Some of your regulars are coming less. Send them Lost &amp; Fund cashback? Paytm picks them; you won't see names.</div>
+        <div class="tiles">
+          <div class="tile"><small>Budget, at most</small><i class="ph"></i></div>
+          <div class="tile"><small>Expected cost</small><i class="ph"></i></div>
+          <div class="tile"><small>Likely extra sales</small><i class="ph"></i></div>
+        </div>
+        <div class="band"><i class="ph-band" aria-hidden="true"></i><span>regular customers are coming less, shown as a band</span></div>
+        <div class="cta">Approve budget</div>
+        <div class="stmt">Weekly settlement: one Lost &amp; Fund cashback line</div>
+      </div>
+      <div class="stack">
+        <h2>Approve a budget, never see who</h2>
+        <ul class="ticks">
+          <li>Count shown as a <b>band</b>, never an exact number</li>
+          <li>A <b>minimum group size</b> per alert; smaller groups wait in a queue</li>
+          <li>Costs <b>rounded</b>; sales shown as a <b>range</b></li>
+          <li>Consent checked <b>before sending and at every payment</b></li>
+          <li><b>Autopilot:</b> approve a monthly budget once</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8 model -->
+  <section class="slide" data-title="The model">
+    <div class="claim">CLAIM No. 08</div>
+    <div class="eyebrow">The model</div>
+    <div class="row cols-2" style="align-items:start">
+      <div class="stack">
+        <h2>Probabilities you can price with</h2>
+        <p>The offer economics multiply by this probability, so it has to be right. A model prices offers only after it passes these checks.</p>
+        <p class="small">Built and tested on simulated data so far. Its real accuracy is measured on pilot data, and only then reported.</p>
+      </div>
+      <ul class="ticks">
+        <li><b>Out-of-time test:</b> trained on past snapshots, scored on a later month it never saw</li>
+        <li><b>Beats a simple baseline:</b> compared with a logistic regression on the same pairs</li>
+        <li><b>Calibrated:</b> predicted and actual lapse rates checked decile by decile, cross-fitted so it isn't graded on its own homework</li>
+        <li><b>Promoted only if it isn't worse:</b> otherwise the new model runs as a shadow</li>
+        <li><b>Watched every run:</b> input drift and kill switches on opt-outs, complaints and budget burn</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 9 one campaign -->
+  <section class="slide" data-title="One campaign">
+    <div class="claim">CLAIM No. 09</div>
+    <div class="eyebrow">One campaign, end to end</div>
+    <div class="row cols-2" style="align-items:start">
+      <div class="stack">
+        <h2>Few offers, each one earned</h2>
+        <p>Each filter removes people an offer can't help or can't pay for.</p>
+        <ul class="ticks tight">
+          <li>Shops get an <b>anonymous count</b>, never names</li>
+          <li>Paytm funds app-switch offers <b>without asking the shop</b></li>
+          <li>Small groups <b>wait</b>, so no shop can guess who</li>
+        </ul>
+      </div>
+      <div class="gates" aria-label="Filters each customer-shop pair passes before cashback">
+        <div class="gate"><b>Slipping and overdue</b><span>Late against their own rhythm at this shop</span></div>
+        <div class="gate"><b>Routed to an offer</b><span>The cause is one an offer can fix</span></div>
+        <div class="gate"><b>Passes anti-abuse caps</b><span>Frequency caps and a limit on repeat win-backs</span></div>
+        <div class="gate"><b>Pays for itself</b><span>For whoever funds it, or the offer shrinks until it does</span></div>
+        <div class="gate"><b>Within budgets</b><span>The shop's monthly budget and Paytm's programme budget</span></div>
+        <div class="gate"><b>Shop stays anonymous</b><span>Groups below the minimum wait in a queue</span></div>
+        <div class="gate"><b>Holdout kept aside</b><span>A random group gets nothing, for measurement</span></div>
+        <div class="gate"><b>Cashback paid</b><span>Only after a qualifying payment clears</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10 measurement -->
+  <section class="slide" data-title="Measurement">
+    <div class="claim">CLAIM No. 10</div>
+    <div class="eyebrow">Measured against a holdout</div>
+    <div class="row cols-2-wide" style="align-items:start">
+      <div class="stack">
+        <h2>Measured against people who got nothing</h2>
+        <p>Every run holds back a random group of eligible customers. The win-back effect is the gap between the two groups, not a before-and-after story.</p>
+        <p><span class="mark">If a sample is too small to prove an effect, the report says so, and weekly runs are pooled until it can.</span></p>
+        <p class="small">Adjusted for past visits; errors clustered by shop.</p>
+      </div>
+      <div class="flow" aria-label="Holdout design: eligible customers split at random into an offer group and a holdout, then compared">
+        <div class="fbox"><b>Eligible customers in this run</b>Only people who passed every filter</div>
+        <div class="arrow" aria-hidden="true"></div>
+        <div class="fsplit">
+          <div class="fbox treat"><b>Get the offer</b>Cashback goes out as designed</div>
+          <div class="fbox hold"><b>Random holdout</b>Same filters, no offer, picked within each shop</div>
+        </div>
+        <div class="arrow" aria-hidden="true"></div>
+        <div class="fbox result"><b>Compare the two groups</b>Did they come back, and keep coming after the offer ended? The gap is the effect, with its confidence range.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11 who gains -->
+  <section class="slide" data-title="Who gains">
+    <div class="claim">CLAIM No. 11</div>
+    <div class="eyebrow">Who gains</div>
+    <h2>Everyone gains</h2>
+    <div class="row cols-3">
+      <div class="card"><div class="eyebrow" style="color:var(--shop)">The shop</div><h3>Keeps its regulars</h3>
+        <p>Pays only when a lost regular comes back and pays. Sees a count, never a name.</p></div>
+      <div class="card" style="border-top-color:var(--paytm)"><div class="eyebrow" style="color:var(--paytm)">Paytm</div><h3>Keeps payments on its rails</h3>
+        <p>Wins back scan-and-pay lost to rival apps, and keeps users active.</p></div>
+      <div class="card" style="border-top-color:var(--split)"><div class="eyebrow" style="color:var(--split)">The customer</div><h3>Gets cashback</h3>
+        <p>No code to remember, and one tap to stop the offers.</p></div>
+    </div>
+    <p class="small">How much each party gains is what the pilot measures.</p>
+  </section>
+
+  <!-- 12 sources -->
+  <section class="slide" data-title="Sources">
+    <div class="claim">CLAIM No. 12</div>
+    <div class="eyebrow">Appendix · Sources</div>
+    <h2>Every number in this deck, with its proof</h2>
+    <table class="who figs">
+      <thead><tr><th>Figure</th><th>What it is</th><th>Source</th></tr></thead>
+      <tbody>
+        <tr><td>25.5 bn</td><td>UPI transactions in October 2026 (25,466.70 million)</td>
+          <td><a href="https://www.npci.org.in/product/upi/product-statistics" target="_blank" rel="noopener">NPCI, UPI Product Statistics</a></td></tr>
+        <tr><td>16.1 bn · 63%</td><td>Person-to-merchant (P2M) UPI transactions in October 2026: 16,094.46 million of 25,466.70 million</td>
+          <td><a href="https://www.npci.org.in/product/ecosystem-statistics/upi" target="_blank" rel="noopener">NPCI, UPI Ecosystem Statistics, P2P and P2M tab</a></td></tr>
+        <tr><td>86%</td><td>Share of P2M payments below ₹500, FY2025-26</td>
+          <td><a href="https://www.pib.gov.in/PressReleasePage.aspx?PRID=2257087&amp;reg=48&amp;lang=2" target="_blank" rel="noopener">Ministry of Finance, PIB release 2257087, 30 Apr 2026</a></td></tr>
+        <tr><td>1.64 crore</td><td>Storefronts with a Paytm Soundbox, Q2 FY27 (quarter to 30 Sep 2026)</td>
+          <td><a href="https://paytm.com/blog/investor-relations/paytm-q2-fy27-results-pat-225-crore-ebitda-rises-90-to-270-crore/" target="_blank" rel="noopener">Paytm Q2 FY27 results, Oct 2026</a></td></tr>
+      </tbody>
+    </table>
+    <p class="small">Lost &amp; Fund was built and tested on simulated data. No simulated figure appears in this deck; the pilot measures the real ones.</p>
+  </section>
+
+</main>
+</div>
+
+<nav class="nav" aria-label="Slides">
+  <button id="prev" aria-label="Previous slide">‹</button>
+  <span class="count" id="count">1 / 12</span>
+  <button id="next" aria-label="Next slide">›</button>
+</nav>
+
+<script>
+(function () {
+  'use strict';
+  const stage = document.getElementById('stage');
+  const slides = [...stage.querySelectorAll('.slide')];
+  let cur = 0;
+
+  /* ---------- fit the 1280x720 stage to the window ---------- */
+  function fit() {
+    const pad = window.innerWidth < 700 ? 24 : 64;
+    const s = Math.min((window.innerWidth - pad) / 1280, (window.innerHeight - pad - 40) / 720);
+    stage.style.transform = `translate(-50%, -50%) scale(${Math.max(s, 0.1)})`;
+  }
+  window.addEventListener('resize', fit);
+  fit();
+
+  /* ---------- navigation ---------- */
+  const count = document.getElementById('count'), prog = document.getElementById('progress');
+  const prev = document.getElementById('prev'), next = document.getElementById('next');
+  function show(i, fromHash) {
+    i = Math.max(0, Math.min(slides.length - 1, i));
+    if (i !== cur) {
+      slides[cur].classList.remove('active');
+      slides[i].classList.add('active');
+      cur = i;
+    }
+    count.textContent = `${i + 1} / ${slides.length}`;
+    prog.style.width = `${((i + 1) / slides.length) * 100}%`;
+    prev.disabled = i === 0;
+    next.disabled = i === slides.length - 1;
+    document.title = i === 0 ? 'Lost & Fund Pitch' : `Lost & Fund Pitch · ${slides[i].dataset.title}`;
+    if (!fromHash) {
+      const h = '#slide-' + (i + 1);
+      try { if (location.hash !== h) history.replaceState(null, '', h); } catch (err) { /* sandboxed frame: keep going */ }
+    }
+  }
+  const fromLocation = () => { const m = /^#slide-(\d+)$/.exec(location.hash); return m ? +m[1] - 1 : 0; };
+  prev.addEventListener('click', () => show(cur - 1));
+  next.addEventListener('click', () => show(cur + 1));
+  window.addEventListener('hashchange', () => show(fromLocation(), true));
+  document.addEventListener('keydown', e => {
+    if (e.altKey || e.ctrlKey || e.metaKey) return;
+    if (e.target.closest && e.target.closest('a') && (e.key === 'Enter' || e.key === ' ')) return;  // let source links open
+    if (['ArrowRight', 'ArrowDown', 'PageDown', ' ', 'Enter'].includes(e.key)) { e.preventDefault(); show(cur + 1); }
+    else if (['ArrowLeft', 'ArrowUp', 'PageUp', 'Backspace'].includes(e.key)) { e.preventDefault(); show(cur - 1); }
+    else if (e.key === 'Home') show(0);
+    else if (e.key === 'End') show(slides.length - 1);
+  });
+  let sx = null;
+  document.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse') sx = e.clientX; });
+  document.addEventListener('pointerup', e => {
+    if (sx === null) return;
+    const dx = e.clientX - sx; sx = null;
+    if (Math.abs(dx) > 50) show(cur + (dx < 0 ? 1 : -1));
+  });
+  stage.classList.add('instant');          // opening on a linked slide: no crossfade from the cover
+  show(fromLocation(), true);
+  requestAnimationFrame(() => requestAnimationFrame(() => stage.classList.remove('instant')));
+})();
+</script>
+</body>
+</html>
